@@ -9,13 +9,34 @@ export interface IUser {
 }
 
 const UserSchema = new Schema<IUser>({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  role: { type: String, enum: ["user", "admin"], default: "user" },
-  createdAt: { type: Date, default: Date.now },
+  name: {
+    type: String,
+    required: [true, "Name is required"],
+    trim: true,
+  },
+  email: {
+    type: String,
+    required: [true, "Email is required"],
+    unique: true,
+    lowercase: true,
+    trim: true,
+  },
+  password: {
+    type: String,
+    required: [true, "Password is required"],
+  },
+  role: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user",
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
+// Next.js hot-reload এ একই মডেল বারবার তৈরি হওয়া আটকাতে এই প্যাটার্ন লাগে
 const User = models.User || model<IUser>("User", UserSchema);
 
 export default User;

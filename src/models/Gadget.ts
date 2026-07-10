@@ -15,25 +15,57 @@ export interface IGadget {
 }
 
 const GadgetSchema = new Schema<IGadget>({
-  title: { type: String, required: true },
+  title: {
+    type: String,
+    required: [true, "Title is required"],
+    trim: true,
+  },
   category: {
     type: String,
     enum: ["phone", "laptop", "camera", "audio", "gaming", "other"],
     required: true,
   },
-  price: { type: Number, required: true },
+  price: {
+    type: Number,
+    required: [true, "Price is required"],
+    min: 0,
+  },
   condition: {
     type: String,
     enum: ["new", "used", "refurbished"],
     required: true,
   },
-  shortDescription: { type: String, required: true },
-  fullDescription: { type: String, required: true },
-  images: { type: [String], default: [] },
-  location: { type: String, required: true },
-  sellerId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  status: { type: String, enum: ["available", "sold"], default: "available" },
-  createdAt: { type: Date, default: Date.now },
+  shortDescription: {
+    type: String,
+    required: true,
+    maxlength: 150,
+  },
+  fullDescription: {
+    type: String,
+    required: true,
+  },
+  images: {
+    type: [String],
+    default: [],
+  },
+  location: {
+    type: String,
+    required: true,
+  },
+  sellerId: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  status: {
+    type: String,
+    enum: ["available", "sold"],
+    default: "available",
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 const Gadget = models.Gadget || model<IGadget>("Gadget", GadgetSchema);
