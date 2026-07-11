@@ -17,6 +17,7 @@ import {
   UserCircle,
   PlusCircle,
   ClipboardList,
+  ShieldAlert,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -89,6 +90,15 @@ export default function Navbar() {
                   <ClipboardList size={16} />
                   My Listings
                 </Link>
+                {user.role === "admin" && (
+                  <Link
+                    href="/admin"
+                    className="flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-full text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors"
+                  >
+                    <ShieldAlert size={16} />
+                    Admin
+                  </Link>
+                )}
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100">
                   <UserCircle size={18} className="text-blue-600" />
                   <span className="text-sm font-medium text-gray-800">
@@ -188,6 +198,16 @@ export default function Navbar() {
                   <ClipboardList size={16} />
                   My Listings
                 </Link>
+                {user.role === "admin" && (
+                  <Link
+                    href="/admin"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center justify-center gap-1.5 text-sm font-medium py-2 rounded-lg text-gray-700 bg-gray-50"
+                  >
+                    <ShieldAlert size={16} />
+                    Admin
+                  </Link>
+                )}
                 <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-50 border border-blue-100">
                   <UserCircle size={18} className="text-blue-600" />
                   <span className="text-sm font-medium text-gray-800">
