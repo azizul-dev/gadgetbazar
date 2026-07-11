@@ -15,6 +15,7 @@ import {
   UserPlus,
   LogOut,
   UserCircle,
+  PlusCircle,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -73,6 +74,13 @@ export default function Navbar() {
               <div className="w-24 h-8 rounded-full bg-gray-100 animate-pulse" />
             ) : user ? (
               <div className="flex items-center gap-3">
+                <Link
+                  href="/items/add"
+                  className="flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-full text-white bg-gradient-to-r from-blue-600 to-teal-500 hover:opacity-90 transition-opacity"
+                >
+                  <PlusCircle size={16} />
+                  Sell Now
+                </Link>
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100">
                   <UserCircle size={18} className="text-blue-600" />
                   <span className="text-sm font-medium text-gray-800">
@@ -93,7 +101,9 @@ export default function Navbar() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className={isActive("/login") ? "text-blue-600 bg-blue-50" : ""}
+                    className={
+                      isActive("/login") ? "text-blue-600 bg-blue-50" : ""
+                    }
                   >
                     <span className="inline-flex items-center justify-center gap-1.5">
                       <LogIn size={16} />
@@ -154,6 +164,14 @@ export default function Navbar() {
               <div className="w-full h-10 rounded-lg bg-gray-100 animate-pulse mt-3" />
             ) : user ? (
               <div className="flex flex-col gap-2 pt-3">
+                <Link
+                  href="/items/add"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center justify-center gap-1.5 text-sm font-medium py-2 rounded-lg text-white bg-gradient-to-r from-blue-600 to-teal-500"
+                >
+                  <PlusCircle size={16} />
+                  Sell Now
+                </Link>
                 <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-50 border border-blue-100">
                   <UserCircle size={18} className="text-blue-600" />
                   <span className="text-sm font-medium text-gray-800">

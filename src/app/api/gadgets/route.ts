@@ -23,17 +23,21 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get("search");
     const minPrice = searchParams.get("minPrice");
     const maxPrice = searchParams.get("maxPrice");
-    const status = searchParams.get("status") || "available";
+    const sellerId = searchParams.get("sellerId");
+    const statusParam = searchParams.get("status");
+    const status = statusParam || (sellerId ? undefined : "available");
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "12", 10);
     const sort = searchParams.get("sort") || "-createdAt";
 
     // ডাইনামিক ফিল্টার অবজেক্ট তৈরি
-    const filter: Record<string, any> = { status };
+    // ডাইনামিক ফিল্টার অবজেক্ট তৈরি
+    const filter: Record<string, any> = {};
 
+    if (status) filter.status = status;
+    if (sellerId) filter.sellerId = sellerId;
     if (category) filter.category = category;
     if (condition) filter.condition = condition;
-
     if (minPrice || maxPrice) {
       filter.price = {};
       if (minPrice) filter.price.$gte = Number(minPrice);
