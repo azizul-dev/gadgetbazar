@@ -1,26 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Mail, Lock, Eye, EyeOff, LogIn, User, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { refetchUser } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({ email: "", password: "" });
 
+  const redirectPath = searchParams.get("redirect") || "/";
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const performLogin = async (email: string, password: string) => {
     setError("");
     setLoading(true);
 
@@ -28,7 +30,7 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
@@ -40,12 +42,27 @@ export default function LoginPage() {
       }
 
       await refetchUser();
-      router.push("/");
+      router.push(redirectPath);
       router.refresh();
     } catch (err) {
       setError("সার্ভারে সমস্যা হয়েছে, পরে আবার চেষ্টা করুন");
       setLoading(false);
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    performLogin(formData.email, formData.password);
+  };
+
+  const handleDemoLogin = (role: "user" | "admin") => {
+    const credentials =
+      role === "admin"
+        ? { email: "demoadmin@gadgetbazar.com", password: "demo1234" }
+        : { email: "demouser@gadgetbazar.com", password: "demo1234" };
+
+    setFormData(credentials);
+    performLogin(credentials.email, credentials.password);
   };
 
   return (
@@ -76,6 +93,34 @@ export default function LoginPage() {
           <p className="mt-2 text-gray-600 text-sm">
             আপনার একাউন্টে প্রবেশ করে গ্যাজেট কেনাবেচা শুরু করুন
           </p>
+        </div>
+
+        {/* Demo Login Buttons */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <button
+            type="button"
+            onClick={() => handleDemoLogin("user")}
+            disabled={loading}
+            className="flex items-center justify-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50 text-blue-700 text-xs font-semibold py-2.5 hover:bg-blue-100 transition-colors disabled:opacity-60"
+          >
+            <User size={14} />
+            Try Demo User
+          </button>
+          <button
+            type="button"
+            onClick={() => handleDemoLogin("admin")}
+            disabled={loading}
+            className="flex items-center justify-center gap-1.5 rounded-xl border border-amber-200 bg-amber-50 text-amber-700 text-xs font-semibold py-2.5 hover:bg-amber-100 transition-colors disabled:opacity-60"
+          >
+            <ShieldCheck size={14} />
+            Try Demo Admin
+          </button>
+        </div>
+
+        <div className="flex items-center gap-3 mb-6">
+          <div className="h-px flex-1 bg-gray-100" />
+          <span className="text-xs text-gray-400">অথবা নিজের একাউন্ট দিয়ে</span>
+          <div className="h-px flex-1 bg-gray-100" />
         </div>
 
         {error && (
@@ -158,5 +203,13 @@ export default function LoginPage() {
         </p>
       </motion.div>
     </section>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   );
 }

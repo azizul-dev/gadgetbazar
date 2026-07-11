@@ -16,6 +16,7 @@ import {
   LogOut,
   UserCircle,
   PlusCircle,
+  ClipboardList,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -80,6 +81,13 @@ export default function Navbar() {
                 >
                   <PlusCircle size={16} />
                   Sell Now
+                </Link>
+                <Link
+                  href="/items/manage"
+                  className="flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-full text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors"
+                >
+                  <ClipboardList size={16} />
+                  My Listings
                 </Link>
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100">
                   <UserCircle size={18} className="text-blue-600" />
@@ -171,6 +179,14 @@ export default function Navbar() {
                 >
                   <PlusCircle size={16} />
                   Sell Now
+                </Link>
+                <Link
+                  href="/items/manage"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center justify-center gap-1.5 text-sm font-medium py-2 rounded-lg text-gray-700 bg-gray-50"
+                >
+                  <ClipboardList size={16} />
+                  My Listings
                 </Link>
                 <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-50 border border-blue-100">
                   <UserCircle size={18} className="text-blue-600" />
