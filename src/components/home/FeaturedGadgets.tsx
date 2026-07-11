@@ -1,64 +1,36 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Button } from "@heroui/react";
-import {
-  ArrowRight,
-  Sparkles,
-  TrendingUp,
-} from "lucide-react";
+import { ArrowRight, Sparkles, TrendingUp } from "lucide-react";
 
 import GadgetCard, { Gadget } from "@/components/gadgets/GadgetCard";
-
-const dummyGadgets: Gadget[] = [
-  {
-    _id: "1",
-    title: "iPhone 13 Pro 128GB",
-    category: "phone",
-    price: 65000,
-    condition: "used",
-    images: [
-      "https://images.unsplash.com/photo-1632661674596-df8be070a5c5?w=400",
-    ],
-    location: "Dhaka",
-  },
-  {
-    _id: "2",
-    title: "MacBook Air M1 2020",
-    category: "laptop",
-    price: 85000,
-    condition: "refurbished",
-    images: [
-      "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400",
-    ],
-    location: "Chattogram",
-  },
-  {
-    _id: "3",
-    title: "Canon EOS 200D",
-    category: "camera",
-    price: 42000,
-    condition: "used",
-    images: [
-      "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=400",
-    ],
-    location: "Sylhet",
-  },
-  {
-    _id: "4",
-    title: "Sony WH-1000XM4",
-    category: "audio",
-    price: 22000,
-    condition: "new",
-    images: [
-      "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=400",
-    ],
-    location: "Dhaka",
-  },
-];
+import GadgetCardSkeleton from "@/components/gadgets/GadgetCardSkeleton";
 
 export default function FeaturedGadgets() {
+  const [gadgets, setGadgets] = useState<Gadget[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        const res = await fetch("/api/gadgets?sort=-createdAt&limit=4");
+        const data = await res.json();
+        if (data.success) {
+          setGadgets(data.data);
+        }
+      } catch (error) {
+        console.error("Featured gadgets fetch error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeatured();
+  }, []);
+
   return (
     <section className="relative overflow-hidden py-24">
       {/* Background */}
@@ -147,36 +119,53 @@ export default function FeaturedGadgets() {
         </motion.div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 items-stretch gap-7 sm:grid-cols-2 lg:grid-cols-4">
-          {dummyGadgets.map((gadget, index) => (
-            <motion.div
-              key={gadget._id}
-              initial={{
-                opacity: 0,
-                y: 40,
-              }}
-              whileInView={{
-                opacity: 1,
-                y: 0,
-              }}
-              whileHover={{
-                y: -10,
-              }}
-              viewport={{ once: true }}
-              transition={{
-                duration: 0.45,
-                delay: index * 0.08,
-              }}
-              className="group flex h-full"
-            >
-              <div className="flex h-full w-full rounded-3xl bg-white/70 p-[2px] shadow-lg backdrop-blur-xl transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-blue-300/30">
-                <div className="flex h-full w-full flex-col rounded-3xl bg-white">
-                  <GadgetCard gadget={gadget} />
+        {loading ? (
+          <div className="grid grid-cols-1 items-stretch gap-7 sm:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <GadgetCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : gadgets.length === 0 ? (
+          <div className="rounded-3xl border border-dashed border-gray-300 bg-white/60 py-20 text-center">
+            <p className="text-lg font-medium text-gray-600">
+              এখনো কোনো গ্যাজেট লিস্ট করা হয়নি
+            </p>
+            <p className="mt-2 text-sm text-gray-500">
+              প্রথম বিক্রেতা হয়ে আপনার গ্যাজেট যোগ করুন
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 items-stretch gap-7 sm:grid-cols-2 lg:grid-cols-4">
+            {gadgets.map((gadget, index) => (
+              <motion.div
+                key={gadget._id}
+                initial={{
+                  opacity: 0,
+                  y: 40,
+                }}
+                whileInView={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                whileHover={{
+                  y: -10,
+                }}
+                viewport={{ once: true }}
+                transition={{
+                  duration: 0.45,
+                  delay: index * 0.08,
+                }}
+                className="group flex h-full"
+              >
+                <div className="flex h-full w-full rounded-3xl bg-white/70 p-[2px] shadow-lg backdrop-blur-xl transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-blue-300/30">
+                  <div className="flex h-full w-full flex-col rounded-3xl bg-white">
+                    <GadgetCard gadget={gadget} />
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
 
         {/* Bottom CTA */}
         <motion.div

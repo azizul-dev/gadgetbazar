@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import {
@@ -13,52 +14,67 @@ import {
   Sparkles,
 } from "lucide-react";
 
-const categories = [
+const categoryMeta = [
   {
     name: "Smartphones",
     value: "phone",
     icon: Smartphone,
     color: "from-blue-600 via-sky-500 to-cyan-500",
-    count: "1.2K+",
   },
   {
     name: "Laptops",
     value: "laptop",
     icon: Laptop,
     color: "from-emerald-500 via-teal-500 to-cyan-500",
-    count: "850+",
   },
   {
     name: "Cameras",
     value: "camera",
     icon: Camera,
     color: "from-orange-500 via-amber-500 to-yellow-500",
-    count: "430+",
   },
   {
     name: "Audio",
     value: "audio",
     icon: Headphones,
     color: "from-purple-500 via-violet-500 to-indigo-500",
-    count: "520+",
   },
   {
     name: "Gaming",
     value: "gaming",
     icon: Gamepad2,
     color: "from-pink-500 via-rose-500 to-red-500",
-    count: "380+",
   },
   {
     name: "Accessories",
     value: "other",
     icon: Package,
     color: "from-cyan-500 via-blue-500 to-indigo-500",
-    count: "940+",
   },
 ];
 
 export default function CategorySection() {
+  const [counts, setCounts] = useState<Record<string, number>>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch("/api/gadgets/stats");
+        const data = await res.json();
+        if (data.success) {
+          setCounts(data.data);
+        }
+      } catch (error) {
+        console.error("Category stats fetch error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   return (
     <section className="relative overflow-hidden py-24">
       {/* Background */}
@@ -98,8 +114,9 @@ export default function CategorySection() {
 
         {/* Categories */}
         <div className="grid grid-cols-2 gap-6 md:grid-cols-3 xl:grid-cols-6">
-          {categories.map((category, index) => {
+          {categoryMeta.map((category, index) => {
             const Icon = category.icon;
+            const count = counts[category.value] ?? 0;
 
             return (
               <motion.div
@@ -133,7 +150,7 @@ export default function CategorySection() {
                   {/* Count */}
                   <div className="relative mt-6 text-center">
                     <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">
-                      {category.count} Items
+                      {loading ? "..." : `${count} Items`}
                     </span>
                   </div>
 
