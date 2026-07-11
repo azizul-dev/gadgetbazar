@@ -223,7 +223,7 @@ export default function GadgetDetailPage() {
           {isOwner && (
             <div className="mt-6 flex gap-3">
               <Link
-                href={`/items/manage`}
+                href={`/items/edit/${gadget._id}`}
                 className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-gray-200 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
               >
                 <Pencil size={15} />

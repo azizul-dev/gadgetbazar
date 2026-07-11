@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { MapPin, Trash2, Eye, PackageX } from "lucide-react";
+import { MapPin, Trash2, Eye, PackageX, Pencil } from "lucide-react";
 
 interface Gadget {
   _id: string;
@@ -41,7 +41,7 @@ export default function ManageItemsPage() {
       try {
         setLoading(true);
         const res = await fetch(
-          `/api/gadgets?sellerId=${user.id}&limit=100&sort=-createdAt`
+          `/api/gadgets?sellerId=${user.id}&limit=100&sort=-createdAt`,
         );
         const data = await res.json();
 
@@ -126,9 +126,7 @@ export default function ManageItemsPage() {
       {gadgets.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
           <PackageX size={48} className="text-gray-300 mb-4" />
-          <p className="text-gray-500 mb-4">
-            আপনার কোনো লিস্টিং নেই এখনো
-          </p>
+          <p className="text-gray-500 mb-4">আপনার কোনো লিস্টিং নেই এখনো</p>
           <Link
             href="/items/add"
             className="text-sm font-medium px-4 py-2 rounded-full text-white bg-gradient-to-r from-blue-600 to-teal-500 hover:opacity-90 transition-opacity"
@@ -184,6 +182,13 @@ export default function ManageItemsPage() {
                     <Eye size={14} />
                     View
                   </Link>
+                  <Link
+                    href={`/items/edit/${gadget._id}`}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-medium py-2 rounded-lg text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors"
+                  >
+                    <Pencil size={14} />
+                    Edit
+                  </Link>
                   <button
                     onClick={() => setDeleteTarget(gadget)}
                     className="flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-medium py-2 rounded-lg text-red-600 bg-red-50 hover:bg-red-100 transition-colors"
@@ -206,7 +211,9 @@ export default function ManageItemsPage() {
               ডিলিট কনফার্ম করুন
             </h3>
             <p className="text-sm text-gray-600 mb-6">
-              আপনি কি নিশ্চিত <span className="font-medium">{deleteTarget.title}</span> ডিলিট করতে চান? এই কাজ ফিরিয়ে নেওয়া যাবে না।
+              আপনি কি নিশ্চিত{" "}
+              <span className="font-medium">{deleteTarget.title}</span> ডিলিট
+              করতে চান? এই কাজ ফিরিয়ে নেওয়া যাবে না।
             </p>
             <div className="flex gap-3">
               <button
