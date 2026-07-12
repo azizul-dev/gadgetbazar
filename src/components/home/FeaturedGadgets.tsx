@@ -70,9 +70,8 @@ export default function FeaturedGadgets() {
 
           <Link href="/gadgets">
             <Button
-              radius="full"
               size="lg"
-              className="group bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-500 px-7 font-semibold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-blue-400/40"
+              className="group rounded-full bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-500 px-7 font-semibold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-blue-400/40"
             >
               <span className="flex items-center gap-2">
                 Explore All
@@ -193,8 +192,7 @@ export default function FeaturedGadgets() {
           <Link href="/gadgets">
             <Button
               size="lg"
-              radius="full"
-              className="mt-8 bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-500 px-10 font-semibold text-white shadow-xl hover:scale-105"
+              className="mt-8 rounded-full bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-500 px-10 font-semibold text-white shadow-xl hover:scale-105"
             >
               Browse Marketplace
             </Button>

@@ -132,10 +132,9 @@ export default function NewsletterSection() {
 
                   <Button
                     type="submit"
-                    radius="full"
                     size="lg"
-                    disabled={submitting}
-                    className="h-14 bg-white px-8 font-semibold text-blue-600 shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-60"
+                    isDisabled={submitting}
+                    className="h-14 rounded-full bg-white px-8 font-semibold text-blue-600 shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-60"
                   >
                     <span className="flex items-center gap-2">
                       {submitting ? "Subscribing..." : "Subscribe"}

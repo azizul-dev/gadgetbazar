@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { SlidersHorizontal, PackageSearch } from "lucide-react";
 import GadgetCard, { Gadget } from "@/components/gadgets/GadgetCard";
@@ -11,7 +11,7 @@ import Pagination from "@/components/gadgets/Pagination";
 const EMPTY_FILTERS: Filters = { category: "", condition: "", minPrice: "", maxPrice: "" };
 const DEFAULT_SORT = "-createdAt";
 
-export default function GadgetsPage() {
+function GadgetsPageInner() {
   const searchParams = useSearchParams();
   const initialSearch = searchParams.get("search") || "";
 
@@ -137,5 +137,13 @@ export default function GadgetsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function GadgetsPage() {
+  return (
+    <Suspense fallback={null}>
+      <GadgetsPageInner />
+    </Suspense>
   );
 }

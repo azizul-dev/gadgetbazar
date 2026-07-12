@@ -1,5 +1,5 @@
 "use client";
-import { SlidersHorizontal, X } from "lucide-react";
+import { SlidersHorizontal, X, ArrowUpDown } from "lucide-react";
 
 export interface Filters {
   category: string;
@@ -25,12 +25,21 @@ const CONDITIONS = [
   { value: "refurbished", label: "রিফার্বিশড" },
 ];
 
+const SORT_OPTIONS = [
+  { value: "-createdAt", label: "নতুন আগে" },
+  { value: "createdAt", label: "পুরাতন আগে" },
+  { value: "price", label: "কম দাম আগে" },
+  { value: "-price", label: "বেশি দাম আগে" },
+];
+
 interface FilterSidebarProps {
   filters: Filters;
   onChange: (filters: Filters) => void;
   onClear: () => void;
   isOpen: boolean;
   onClose: () => void;
+  sort: string;
+  onSortChange: (sort: string) => void;
 }
 
 export default function FilterSidebar({
@@ -39,6 +48,8 @@ export default function FilterSidebar({
   onClear,
   isOpen,
   onClose,
+  sort,
+  onSortChange,
 }: FilterSidebarProps) {
   const hasActiveFilters =
     filters.category || filters.condition || filters.minPrice || filters.maxPrice;
@@ -74,6 +85,24 @@ export default function FilterSidebar({
               <X size={18} />
             </button>
           </div>
+        </div>
+
+        <div className="mb-6">
+          <h3 className="mb-2.5 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500">
+            <ArrowUpDown size={13} />
+            সাজান
+          </h3>
+          <select
+            value={sort}
+            onChange={(e) => onSortChange(e.target.value)}
+            className="w-full rounded-lg border border-gray-200 px-2.5 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+          >
+            {SORT_OPTIONS.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="mb-6">
