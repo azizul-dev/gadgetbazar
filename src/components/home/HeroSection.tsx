@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, type Variants } from "framer-motion";
 import Link from "next/link";
 import { Button } from "@heroui/react";
@@ -15,6 +17,23 @@ const fadeUp: Variants = {
 };
 
 export default function HeroSection() {
+  const router = useRouter();
+  const [query, setQuery] = useState("");
+
+  const handleSearch = () => {
+    const trimmed = query.trim();
+    router.push(
+      trimmed ? `/gadgets?search=${encodeURIComponent(trimmed)}` : "/gadgets"
+    );
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSearch();
+    }
+  };
+
   return (
     <section className="relative min-h-[65vh] flex items-center overflow-hidden bg-gradient-to-b from-blue-50 via-white to-teal-50/40">
       {/* Animated glow blobs */}
@@ -92,11 +111,17 @@ export default function HeroSection() {
             <Search size={18} className="text-gray-400 shrink-0" />
             <input
               type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
               placeholder="Search for any gadget..."
               className="w-full px-2 py-2 outline-none text-gray-700 bg-transparent"
             />
           </div>
-          <Button className="rounded-full px-6 text-white bg-gradient-to-r from-blue-600 to-teal-500 hover:opacity-90 transition-opacity border-0">
+          <Button
+            onClick={handleSearch}
+            className="rounded-full px-6 text-white bg-gradient-to-r from-blue-600 to-teal-500 hover:opacity-90 transition-opacity border-0"
+          >
             <span className="inline-flex items-center justify-center">
               Search
             </span>

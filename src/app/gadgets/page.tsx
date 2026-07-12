@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { SlidersHorizontal, PackageSearch } from "lucide-react";
 import GadgetCard, { Gadget } from "@/components/gadgets/GadgetCard";
 import GadgetCardSkeleton from "@/components/gadgets/GadgetCardSkeleton";
@@ -10,10 +11,13 @@ import Pagination from "@/components/gadgets/Pagination";
 const EMPTY_FILTERS: Filters = { category: "", condition: "", minPrice: "", maxPrice: "" };
 
 export default function GadgetsPage() {
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get("search") || "";
+
   const [gadgets, setGadgets] = useState<Gadget[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(initialSearch);
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -73,7 +77,7 @@ export default function GadgetsPage() {
       </div>
 
       <div className="mb-6 flex items-center gap-3">
-        <SearchBar onSearch={setSearch} />
+        <SearchBar defaultValue={search} onSearch={setSearch} />
         <button
           onClick={() => setMobileFilterOpen(true)}
           className="flex shrink-0 items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm lg:hidden"
