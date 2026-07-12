@@ -25,7 +25,12 @@ export async function GET(req: NextRequest) {
     const maxPrice = searchParams.get("maxPrice");
     const sellerId = searchParams.get("sellerId");
     const statusParam = searchParams.get("status");
-    const status = statusParam || (sellerId ? undefined : "available");
+    const status =
+      statusParam !== null
+        ? statusParam || undefined
+        : sellerId
+          ? undefined
+          : "available";
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "12", 10);
     const sort = searchParams.get("sort") || "-createdAt";
@@ -74,7 +79,7 @@ export async function GET(req: NextRequest) {
     console.error("Get gadgets error:", error);
     return NextResponse.json(
       { success: false, message: "গ্যাজেট লোড করা যায়নি" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -87,7 +92,7 @@ export async function POST(req: NextRequest) {
     if (!currentUser) {
       return NextResponse.json(
         { success: false, message: "এই কাজের জন্য লগইন করতে হবে" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -117,7 +122,7 @@ export async function POST(req: NextRequest) {
     ) {
       return NextResponse.json(
         { success: false, message: "সব প্রয়োজনীয় ফিল্ড পূরণ করতে হবে" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -135,15 +140,12 @@ export async function POST(req: NextRequest) {
       status: "available",
     });
 
-    return NextResponse.json(
-      { success: true, data: gadget },
-      { status: 201 }
-    );
+    return NextResponse.json({ success: true, data: gadget }, { status: 201 });
   } catch (error) {
     console.error("Create gadget error:", error);
     return NextResponse.json(
       { success: false, message: "গ্যাজেট তৈরি করা যায়নি" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

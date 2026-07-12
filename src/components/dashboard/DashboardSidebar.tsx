@@ -10,11 +10,14 @@ import {
   UserCircle2,
   LogOut,
   ArrowLeft,
+  Users2,
+  Package,
 } from "lucide-react";
 
 const adminMenu = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/items/manage", label: "My Listings", icon: ClipboardList },
+  { href: "/admin/users", label: "Users", icon: Users2 },
+  { href: "/admin/listings", label: "All Listings", icon: Package },
   { href: "/items/add", label: "Add Item", icon: PlusCircle },
   { href: "/profile", label: "Admin Profile", icon: UserCircle2 },
 ];
