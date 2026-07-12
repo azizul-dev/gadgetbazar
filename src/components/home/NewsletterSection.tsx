@@ -3,24 +3,40 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@heroui/react";
-import {
-  Mail,
-  CheckCircle2,
-  Sparkles,
-  ArrowRight,
-} from "lucide-react";
+import { Mail, CheckCircle2, Sparkles, ArrowRight } from "lucide-react";
 
 export default function NewsletterSection() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!email) return;
 
-    // TODO: Connect with your newsletter API
-    setSubscribed(true);
+    setSubmitting(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setSubscribed(true);
+      } else {
+        setError(data.message || "Something went wrong");
+      }
+    } catch {
+      setError("Could not connect to the server");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -73,9 +89,8 @@ export default function NewsletterSection() {
             </h2>
 
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-white/90">
-              Subscribe to our newsletter and be the first to discover
-              exclusive offers, trending gadgets, and the latest marketplace
-              updates.
+              Subscribe to our newsletter and be the first to discover exclusive
+              offers, trending gadgets, and the latest marketplace updates.
             </p>
 
             {subscribed ? (
@@ -90,15 +105,10 @@ export default function NewsletterSection() {
                 }}
                 className="mx-auto mt-10 flex max-w-md items-center justify-center gap-3 rounded-2xl bg-white/15 px-6 py-5 text-white backdrop-blur-xl"
               >
-                <CheckCircle2
-                  size={28}
-                  className="text-emerald-300"
-                />
+                <CheckCircle2 size={28} className="text-emerald-300" />
 
                 <div className="text-left">
-                  <p className="font-semibold">
-                    Subscription Successful
-                  </p>
+                  <p className="font-semibold">Subscription Successful</p>
 
                   <p className="text-sm text-white/80">
                     Thank you for joining our community.
@@ -106,31 +116,39 @@ export default function NewsletterSection() {
                 </div>
               </motion.div>
             ) : (
-              <form
-                onSubmit={handleSubmit}
-                className="mx-auto mt-10 flex max-w-2xl flex-col gap-4 sm:flex-row"
-              >
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email address"
-                  className="h-14 flex-1 rounded-full border border-white/20 bg-white/95 px-6 text-gray-800 outline-none transition-all placeholder:text-gray-400 focus:border-white focus:ring-4 focus:ring-white/30"
-                />
-
-                <Button
-                  type="submit"
-                  radius="full"
-                  size="lg"
-                  className="h-14 bg-white px-8 font-semibold text-blue-600 shadow-lg transition-all duration-300 hover:scale-105"
+              <>
+                <form
+                  onSubmit={handleSubmit}
+                  className="mx-auto mt-10 flex max-w-2xl flex-col gap-4 sm:flex-row"
                 >
-                  <span className="flex items-center gap-2">
-                    Subscribe
-                    <ArrowRight size={18} />
-                  </span>
-                </Button>
-              </form>
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email address"
+                    className="h-14 flex-1 rounded-full border border-white/20 bg-white/95 px-6 text-gray-800 outline-none transition-all placeholder:text-gray-400 focus:border-white focus:ring-4 focus:ring-white/30"
+                  />
+
+                  <Button
+                    type="submit"
+                    radius="full"
+                    size="lg"
+                    disabled={submitting}
+                    className="h-14 bg-white px-8 font-semibold text-blue-600 shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-60"
+                  >
+                    <span className="flex items-center gap-2">
+                      {submitting ? "Subscribing..." : "Subscribe"}
+                      <ArrowRight size={18} />
+                    </span>
+                  </Button>
+                </form>
+                {error && (
+                  <p className="mt-3 text-sm font-medium text-red-100">
+                    {error}
+                  </p>
+                )}
+              </>
             )}
 
             {/* Bottom Features */}

@@ -1,35 +1,42 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import {
-  Star,
-  Quote,
-  Sparkles,
-  BadgeCheck,
-} from "lucide-react";
+import { Star, Quote, Sparkles, BadgeCheck, Loader2 } from "lucide-react";
 
-const testimonials = [
-  {
-    name: "Rafiul Islam",
-    role: "Verified Buyer • Dhaka",
-    text: "I sold my old MacBook within just two days. The entire process was smooth, secure, and incredibly simple.",
-    rating: 5,
-  },
-  {
-    name: "Nusrat Jahan",
-    role: "Verified Seller • Chattogram",
-    text: "Listing my gadget took less than five minutes. I quickly connected with genuine buyers without any hassle.",
-    rating: 5,
-  },
-  {
-    name: "Tanvir Ahmed",
-    role: "Verified Buyer • Sylhet",
-    text: "I found exactly what I was looking for at a great price. The seller was trustworthy and the experience was excellent.",
-    rating: 5,
-  },
-];
+interface Testimonial {
+  _id: string;
+  name: string;
+  role: string;
+  text: string;
+  rating: number;
+}
 
 export default function TestimonialSection() {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/testimonials")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) setTestimonials(data.data);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="flex min-h-[400px] items-center justify-center py-24">
+        <Loader2 className="animate-spin text-blue-600" size={32} />
+      </section>
+    );
+  }
+
+  if (testimonials.length === 0) {
+    return null;
+  }
+
   return (
     <section className="relative overflow-hidden py-24">
       {/* Background */}
@@ -71,7 +78,7 @@ export default function TestimonialSection() {
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {testimonials.map((item, index) => (
             <motion.div
-              key={item.name}
+              key={item._id}
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               whileHover={{
@@ -111,7 +118,7 @@ export default function TestimonialSection() {
 
                 {/* Review */}
                 <p className="text-[15px] leading-8 text-gray-600">
-                  "{item.text}"
+                  &ldquo;{item.text}&rdquo;
                 </p>
 
                 {/* Divider */}
@@ -124,15 +131,10 @@ export default function TestimonialSection() {
                   </div>
 
                   <div className="flex-1">
-                    <h4 className="font-bold text-gray-900">
-                      {item.name}
-                    </h4>
+                    <h4 className="font-bold text-gray-900">{item.name}</h4>
 
                     <div className="mt-1 flex items-center gap-2 text-sm text-gray-500">
-                      <BadgeCheck
-                        size={15}
-                        className="text-emerald-500"
-                      />
+                      <BadgeCheck size={15} className="text-emerald-500" />
                       {item.role}
                     </div>
                   </div>
@@ -153,24 +155,26 @@ export default function TestimonialSection() {
           <div className="rounded-[32px] border border-white/60 bg-white/80 p-10 shadow-xl backdrop-blur-xl">
             <div className="grid gap-10 text-center md:grid-cols-3">
               <div>
-                <h3 className="text-4xl font-black text-blue-600">15K+</h3>
-                <p className="mt-2 text-gray-600">
-                  Happy Customers
-                </p>
+                <h3 className="text-4xl font-black text-blue-600">
+                  {testimonials.length}+
+                </h3>
+                <p className="mt-2 text-gray-600">Happy Customers</p>
               </div>
 
               <div>
-                <h3 className="text-4xl font-black text-blue-600">4.9★</h3>
-                <p className="mt-2 text-gray-600">
-                  Average User Rating
-                </p>
+                <h3 className="text-4xl font-black text-blue-600">
+                  {(
+                    testimonials.reduce((sum, t) => sum + t.rating, 0) /
+                    testimonials.length
+                  ).toFixed(1)}
+                  ★
+                </h3>
+                <p className="mt-2 text-gray-600">Average User Rating</p>
               </div>
 
               <div>
                 <h3 className="text-4xl font-black text-blue-600">98%</h3>
-                <p className="mt-2 text-gray-600">
-                  Successful Transactions
-                </p>
+                <p className="mt-2 text-gray-600">Successful Transactions</p>
               </div>
             </div>
           </div>
