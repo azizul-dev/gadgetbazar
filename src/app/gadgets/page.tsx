@@ -9,6 +9,7 @@ import FilterSidebar, { Filters } from "@/components/gadgets/FilterSidebar";
 import Pagination from "@/components/gadgets/Pagination";
 
 const EMPTY_FILTERS: Filters = { category: "", condition: "", minPrice: "", maxPrice: "" };
+const DEFAULT_SORT = "-createdAt";
 
 export default function GadgetsPage() {
   const searchParams = useSearchParams();
@@ -19,6 +20,7 @@ export default function GadgetsPage() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState(initialSearch);
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
+  const [sort, setSort] = useState(DEFAULT_SORT);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
@@ -31,6 +33,7 @@ export default function GadgetsPage() {
       const params = new URLSearchParams();
       params.set("page", String(page));
       params.set("limit", "12");
+      params.set("sort", sort);
       if (search) params.set("search", search);
       if (filters.category) params.set("category", filters.category);
       if (filters.condition) params.set("condition", filters.condition);
@@ -55,7 +58,7 @@ export default function GadgetsPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, filters]);
+  }, [page, search, filters, sort]);
 
   useEffect(() => {
     fetchGadgets();
@@ -63,7 +66,7 @@ export default function GadgetsPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, filters]);
+  }, [search, filters, sort]);
 
   const handleClearFilters = () => setFilters(EMPTY_FILTERS);
 
@@ -94,6 +97,8 @@ export default function GadgetsPage() {
           onClear={handleClearFilters}
           isOpen={mobileFilterOpen}
           onClose={() => setMobileFilterOpen(false)}
+          sort={sort}
+          onSortChange={setSort}
         />
 
         <div>

@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { Mail, MapPin, Phone } from "lucide-react";
+import { motion } from "framer-motion";
 
 function FacebookIcon() {
   return (
@@ -17,156 +20,166 @@ function TwitterIcon() {
   );
 }
 
-function InstagramIcon() {
+function LinkedInIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-      <rect x="3" y="3" width="18" height="18" rx="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.61 0 4.28 2.38 4.28 5.47v6.27ZM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13ZM7.12 20.45H3.56V9h3.56v11.45Z" />
     </svg>
   );
 }
 
+/* Reusable animated link with a sliding underline — used by all footer nav lists */
+function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link href={href} className="group relative inline-block text-gray-400 transition-colors hover:text-white">
+      {children}
+      <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-amber-400 transition-all duration-300 ease-out group-hover:w-full" />
+    </Link>
+  );
+}
+
+const columnVariants = {
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0 },
+};
+
+const containerVariants = {
+  hidden: {},
+  show: {
+    transition: { staggerChildren: 0.12 },
+  },
+};
+
+const socialLinks = [
+  { href: "https://www.facebook.com/md.azizul.islam.176759", label: "Facebook", Icon: FacebookIcon },
+  { href: "https://x.com/md_azizul63253", label: "X (Twitter)", Icon: TwitterIcon },
+  { href: "https://www.linkedin.com/in/azizul-islam-dev/", label: "LinkedIn", Icon: LinkedInIcon },
+];
+
+const quickLinks = [
+  { href: "/", label: "Home" },
+  { href: "/gadgets", label: "Explore Gadgets" },
+  { href: "/items/add", label: "Sell an Item" },
+  { href: "/about", label: "About Us" },
+  { href: "/contact", label: "Contact" },
+];
+
+const categoryLinks = [
+  { href: "/gadgets?category=phone", label: "Phones" },
+  { href: "/gadgets?category=laptop", label: "Laptops" },
+  { href: "/gadgets?category=camera", label: "Cameras" },
+  { href: "/gadgets?category=audio", label: "Audio" },
+  { href: "/gadgets?category=gaming", label: "Gaming" },
+];
+
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-gray-300">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+    <footer className="relative overflow-hidden bg-[#0A0A0B] text-gray-300">
+      {/* Signature hairline: soft amber glow along the top edge */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/70 to-transparent" />
+      <div className="pointer-events-none absolute -top-40 left-1/2 h-80 w-[36rem] -translate-x-1/2 rounded-full bg-amber-400/[0.06] blur-3xl" />
+
+      <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.2 }}
+          className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8"
+        >
           {/* Brand */}
-          <div>
-            <h3 className="text-xl font-bold text-white">
+          <motion.div variants={columnVariants} transition={{ duration: 0.5, ease: "easeOut" }}>
+            <h3 className="text-xl font-bold tracking-tight text-white">
               Gadget<span className="text-amber-400">Bazar</span>
             </h3>
-            <p className="mt-3 text-sm text-gray-400 leading-relaxed">
+            <p className="mt-3 text-sm leading-relaxed text-gray-400">
               Bangladesh&apos;s trusted marketplace for buying and selling second-hand
               gadgets — phones, laptops, cameras, and more.
             </p>
-            <div className="mt-4 flex gap-3">
-              <a
-                href="#"
-                aria-label="Facebook"
-                className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center hover:bg-blue-600 transition-colors"
-              >
-                <FacebookIcon />
-              </a>
-              <a
-                href="#"
-                aria-label="Twitter"
-                className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center hover:bg-blue-600 transition-colors"
-              >
-                <TwitterIcon />
-              </a>
-              <a
-                href="#"
-                aria-label="Instagram"
-                className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center hover:bg-amber-500 transition-colors"
-              >
-                <InstagramIcon />
-              </a>
+
+            <div className="mt-5 flex gap-3">
+              {socialLinks.map(({ href, label, Icon }) => (
+                <motion.a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  whileHover={{ y: -3, scale: 1.08 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-gray-300 transition-colors hover:border-amber-400/40 hover:text-amber-400 hover:shadow-[0_0_16px_rgba(251,191,36,0.25)]"
+                >
+                  <Icon />
+                </motion.a>
+              ))}
             </div>
-          </div>
+          </motion.div>
 
           {/* Quick Links */}
-          <div>
-            <h4 className="text-sm font-semibold text-white uppercase tracking-wide">
+          <motion.div variants={columnVariants} transition={{ duration: 0.5, ease: "easeOut" }}>
+            <h4 className="text-xs font-semibold uppercase tracking-widest text-white/90">
               Quick Links
             </h4>
-            <ul className="mt-4 space-y-2 text-sm">
-              <li>
-                <Link href="/" className="hover:text-white transition-colors">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link href="/gadgets" className="hover:text-white transition-colors">
-                  Explore Gadgets
-                </Link>
-              </li>
-              <li>
-                <Link href="/items/add" className="hover:text-white transition-colors">
-                  Sell an Item
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="hover:text-white transition-colors">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-white transition-colors">
-                  Contact
-                </Link>
-              </li>
+            <ul className="mt-5 space-y-3 text-sm">
+              {quickLinks.map((link) => (
+                <li key={link.href}>
+                  <FooterLink href={link.href}>{link.label}</FooterLink>
+                </li>
+              ))}
             </ul>
-          </div>
+          </motion.div>
 
           {/* Categories */}
-          <div>
-            <h4 className="text-sm font-semibold text-white uppercase tracking-wide">
+          <motion.div variants={columnVariants} transition={{ duration: 0.5, ease: "easeOut" }}>
+            <h4 className="text-xs font-semibold uppercase tracking-widest text-white/90">
               Categories
             </h4>
-            <ul className="mt-4 space-y-2 text-sm">
-              <li>
-                <Link href="/gadgets?category=phone" className="hover:text-white transition-colors">
-                  Phones
-                </Link>
-              </li>
-              <li>
-                <Link href="/gadgets?category=laptop" className="hover:text-white transition-colors">
-                  Laptops
-                </Link>
-              </li>
-              <li>
-                <Link href="/gadgets?category=camera" className="hover:text-white transition-colors">
-                  Cameras
-                </Link>
-              </li>
-              <li>
-                <Link href="/gadgets?category=audio" className="hover:text-white transition-colors">
-                  Audio
-                </Link>
-              </li>
-              <li>
-                <Link href="/gadgets?category=gaming" className="hover:text-white transition-colors">
-                  Gaming
-                </Link>
-              </li>
+            <ul className="mt-5 space-y-3 text-sm">
+              {categoryLinks.map((link) => (
+                <li key={link.href}>
+                  <FooterLink href={link.href}>{link.label}</FooterLink>
+                </li>
+              ))}
             </ul>
-          </div>
+          </motion.div>
 
           {/* Contact */}
-          <div>
-            <h4 className="text-sm font-semibold text-white uppercase tracking-wide">
+          <motion.div variants={columnVariants} transition={{ duration: 0.5, ease: "easeOut" }}>
+            <h4 className="text-xs font-semibold uppercase tracking-widest text-white/90">
               Contact Us
             </h4>
-            <ul className="mt-4 space-y-3 text-sm">
-              <li className="flex items-start gap-2">
+            <ul className="mt-5 space-y-3 text-sm">
+              <li className="flex items-start gap-2.5">
                 <MapPin size={16} className="mt-0.5 shrink-0 text-amber-400" />
-                <span>Dhaka, Bangladesh</span>
+                <span className="text-gray-400">Dhaka, Bangladesh</span>
               </li>
-              <li className="flex items-center gap-2">
+              <li className="flex items-center gap-2.5">
                 <Phone size={16} className="shrink-0 text-amber-400" />
-                <span>+880 1234-567890</span>
+                <span className="text-gray-400">+880 1234-567890</span>
               </li>
-              <li className="flex items-center gap-2">
+              <li className="flex items-center gap-2.5">
                 <Mail size={16} className="shrink-0 text-amber-400" />
-                <span>support@gadgetbazar.com</span>
+                <span className="text-gray-400">support@gadgetbazar.com</span>
               </li>
             </ul>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        <div className="mt-10 pt-6 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
+        {/* Bottom bar */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-xs text-gray-500 sm:flex-row"
+        >
           <p>&copy; {new Date().getFullYear()} GadgetBazar. All rights reserved.</p>
-          <div className="flex gap-4">
-            <Link href="#" className="hover:text-white transition-colors">
-              Privacy Policy
-            </Link>
-            <Link href="#" className="hover:text-white transition-colors">
-              Terms of Service
-            </Link>
+          <div className="flex gap-5">
+            <FooterLink href="/privacy">Privacy Policy</FooterLink>
+            <FooterLink href="/terms">Terms of Service</FooterLink>
           </div>
-        </div>
+        </motion.div>
       </div>
     </footer>
   );
