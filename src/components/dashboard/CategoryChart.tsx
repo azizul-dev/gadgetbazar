@@ -54,10 +54,14 @@ export default function CategoryChart() {
   return (
     <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
       <ResponsiveContainer width="100%" height={280}>
-        <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+        <BarChart data={data} margin={{ top: 10, right: 32, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
           <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#64748b" }} />
-          <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: "#64748b" }} />
+          <YAxis
+            width={32}
+            allowDecimals={false}
+            tick={{ fontSize: 12, fill: "#64748b" }}
+          />
           <Tooltip
             contentStyle={{
               borderRadius: 12,
@@ -65,7 +69,7 @@ export default function CategoryChart() {
               fontSize: 13,
             }}
           />
-          <Bar dataKey="count" radius={[8, 8, 0, 0]}>
+          <Bar dataKey="count" radius={[8, 8, 0, 0]} maxBarSize={60}>
             {data.map((_, index) => (
               <Cell key={index} fill={COLORS[index % COLORS.length]} />
             ))}

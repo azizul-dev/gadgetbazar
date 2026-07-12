@@ -3,8 +3,8 @@ const path = require("path");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
-// .env থেকে ম্যানুয়ালি এনভায়রনমেন্ট ভ্যারিয়েবল লোড করা
-const envPath = path.join(__dirname, "..", ".env");
+// .env.local থেকে ম্যানুয়ালি এনভায়রনমেন্ট ভ্যারিয়েবল লোড করা
+const envPath = path.join(__dirname, "..", ".env.local");
 const envContent = fs.readFileSync(envPath, "utf-8");
 envContent.split("\n").forEach((line) => {
   const match = line.match(/^([^#=]+)=(.*)$/);
@@ -17,7 +17,7 @@ envContent.split("\n").forEach((line) => {
 
 const MONGODB_URI = process.env.MONGODB_URI;
 if (!MONGODB_URI) {
-  console.error("MONGODB_URI পাওয়া যায়নি .env এ");
+  console.error("MONGODB_URI পাওয়া যায়নি .env.local এ");
   process.exit(1);
 }
 

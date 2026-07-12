@@ -3,6 +3,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import GadgetCard, { Gadget } from "@/components/gadgets/GadgetCard";
+import GadgetCardSkeleton from "@/components/gadgets/GadgetCardSkeleton";
 import {
   MapPin,
   Loader2,
@@ -51,6 +53,9 @@ export default function GadgetDetailPage() {
   const [deleting, setDeleting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
+  const [relatedGadgets, setRelatedGadgets] = useState<Gadget[]>([]);
+  const [relatedLoading, setRelatedLoading] = useState(false);
+
   const fetchGadget = useCallback(async () => {
     setLoading(true);
     setError("");
@@ -75,6 +80,31 @@ export default function GadgetDetailPage() {
   useEffect(() => {
     if (id) fetchGadget();
   }, [id, fetchGadget]);
+
+  const fetchRelated = useCallback(async (category: string, excludeId: string) => {
+    setRelatedLoading(true);
+    try {
+      const params = new URLSearchParams();
+      params.set("category", category);
+      params.set("limit", "5");
+
+      const res = await fetch(`/api/gadgets?${params.toString()}`);
+      const json = await res.json();
+
+      if (json.success) {
+        const filtered = json.data.filter((g: Gadget) => g._id !== excludeId).slice(0, 4);
+        setRelatedGadgets(filtered);
+      }
+    } catch {
+      // related items are a nice-to-have — fail silently, don't block the page
+    } finally {
+      setRelatedLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (gadget) fetchRelated(gadget.category, gadget._id);
+  }, [gadget, fetchRelated]);
 
   const isOwner = !!(user && gadget?.sellerId && user.id === gadget.sellerId._id);
 
@@ -240,6 +270,26 @@ export default function GadgetDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Related Items */}
+      {(relatedLoading || relatedGadgets.length > 0) && (
+        <div className="mt-12">
+          <h2 className="mb-4 text-lg font-semibold text-gray-900">Related Items</h2>
+          {relatedLoading ? (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <GadgetCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
+              {relatedGadgets.map((g) => (
+                <GadgetCard key={g._id} gadget={g} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Delete confirmation modal */}
       {showConfirm && (

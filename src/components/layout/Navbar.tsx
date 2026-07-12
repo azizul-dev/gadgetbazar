@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { Button } from "@heroui/react";
 import {
   Home,
@@ -15,7 +16,6 @@ import {
   UserPlus,
   LogOut,
   UserCircle,
-  LayoutDashboard,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -26,15 +26,91 @@ const navLinks = [
   { href: "/contact", label: "Contact", icon: Phone },
 ];
 
+// পেজ যেগুলো নিজস্ব DashboardShell/Sidebar ব্যবহার করে — এখানে টপ Navbar দেখানোর দরকার নেই
+const HIDDEN_NAVBAR_PREFIXES = ["/admin", "/items/manage", "/profile"];
+
+function BlackHoleIcon({ size = 34 }: { size?: number }) {
+  return (
+    <motion.div
+      className="relative shrink-0 rounded-full"
+      style={{ width: size, height: size }}
+      animate={{ rotate: 360 }}
+      transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+    >
+      <div
+        className="absolute inset-0 rounded-full"
+        style={{
+          background:
+            "conic-gradient(from 0deg, #0f172a, #2563EB, #0D9488, #0f172a)",
+        }}
+      />
+      <div
+        className="absolute rounded-full bg-black"
+        style={{
+          inset: "22%",
+          boxShadow: "0 0 10px 2px rgba(37, 99, 235, 0.55)",
+        }}
+      />
+    </motion.div>
+  );
+}
+
+function BlackHoleOverlay() {
+  return (
+    <div className="pointer-events-none fixed inset-0 z-[999] flex items-center justify-center overflow-hidden">
+      <motion.div
+        className="rounded-full"
+        style={{
+          width: 30,
+          height: 30,
+          background:
+            "radial-gradient(circle, #000 0%, #0f172a 20%, #2563EB 35%, #0D9488 50%, #000 72%)",
+        }}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 160, opacity: 1, rotate: 540 }}
+        transition={{ duration: 0.9, ease: [0.6, 0, 0.9, 0.2] }}
+      />
+    </div>
+  );
+}
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
   const pathname = usePathname();
+  const router = useRouter();
   const { user, loading, logout } = useAuth();
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   const dashboardHref = user?.role === "admin" ? "/admin" : "/items/manage";
+
+  // dashboard শেলযুক্ত পেজে পৌঁছানোর সাথে সাথে ওভারলে ও ট্রানজিশন স্টেট রিসেট
+  useEffect(() => {
+    if (pendingHref && pathname === pendingHref) {
+      setIsTransitioning(false);
+      setPendingHref(null);
+    }
+  }, [pathname, pendingHref]);
+
+  const hideNavbar = HIDDEN_NAVBAR_PREFIXES.some(
+    (p) => pathname === p || pathname.startsWith(p + "/")
+  );
+
+  if (hideNavbar) return null;
+
+  const handleDashboardClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isTransitioning) return;
+    setPendingHref(dashboardHref);
+    setIsTransitioning(true);
+  };
+
+  const handleOverlayAnimationComplete = () => {
+    router.push(dashboardHref);
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/80 backdrop-blur-md">
@@ -81,13 +157,14 @@ export default function Navbar() {
                     {user.name}
                   </span>
                 </div>
-                <Link
-                  href={dashboardHref}
-                  className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-blue-600 to-teal-500 px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+                <button
+                  onClick={handleDashboardClick}
+                  aria-label="Go to Dashboard"
+                  title="Dashboard"
+                  className="relative flex items-center justify-center rounded-full p-1 transition-transform hover:scale-110"
                 >
-                  <LayoutDashboard size={16} />
-                  Dashboard
-                </Link>
+                  <BlackHoleIcon size={34} />
+                </button>
                 <button
                   onClick={logout}
                   className="flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
@@ -171,14 +248,17 @@ export default function Navbar() {
                     {user.name}
                   </span>
                 </div>
-                <Link
-                  href={dashboardHref}
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-blue-600 to-teal-500 py-2 text-sm font-medium text-white"
+                <button
+                  onClick={(e) => {
+                    handleDashboardClick(e);
+                    setIsOpen(false);
+                  }}
+                  aria-label="Go to Dashboard"
+                  className="flex items-center justify-center gap-2 rounded-lg border border-gray-100 py-2 text-sm font-medium text-gray-800"
                 >
-                  <LayoutDashboard size={16} />
+                  <BlackHoleIcon size={26} />
                   Dashboard
-                </Link>
+                </button>
                 <button
                   onClick={() => {
                     setIsOpen(false);
@@ -216,6 +296,30 @@ export default function Navbar() {
           </div>
         )}
       </div>
+
+      {isTransitioning && (
+        <BlackHoleOverlayWrapper onComplete={handleOverlayAnimationComplete} />
+      )}
     </header>
+  );
+}
+
+function BlackHoleOverlayWrapper({ onComplete }: { onComplete: () => void }) {
+  return (
+    <div className="pointer-events-none fixed inset-0 z-[999] flex items-center justify-center overflow-hidden">
+      <motion.div
+        className="rounded-full"
+        style={{
+          width: 30,
+          height: 30,
+          background:
+            "radial-gradient(circle, #000 0%, #0f172a 20%, #2563EB 35%, #0D9488 50%, #000 72%)",
+        }}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 160, opacity: 1, rotate: 540 }}
+        transition={{ duration: 0.9, ease: [0.6, 0, 0.9, 0.2] }}
+        onAnimationComplete={onComplete}
+      />
+    </div>
   );
 }
