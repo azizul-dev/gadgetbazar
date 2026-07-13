@@ -109,7 +109,7 @@ function GadgetsPageInner() {
           )}
 
           {!error && loading && (
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {Array.from({ length: 8 }).map((_, i) => (
                 <GadgetCardSkeleton key={i} />
               ))}
@@ -126,7 +126,7 @@ function GadgetsPageInner() {
 
           {!error && !loading && gadgets.length > 0 && (
             <>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                 {gadgets.map((gadget) => (
                   <GadgetCard key={gadget._id} gadget={gadget} />
                 ))}

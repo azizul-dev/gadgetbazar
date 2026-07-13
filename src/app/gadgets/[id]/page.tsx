@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import GadgetCard, { Gadget } from "@/components/gadgets/GadgetCard";
 import GadgetCardSkeleton from "@/components/gadgets/GadgetCardSkeleton";
+import ReviewSection from "@/components/gadgets/ReviewSection";
 import {
   MapPin,
   Loader2,
@@ -271,18 +272,21 @@ export default function GadgetDetailPage() {
         </div>
       </div>
 
+      {/* Reviews & Ratings */}
+      <ReviewSection gadgetId={gadget._id} />
+
       {/* Related Items */}
       {(relatedLoading || relatedGadgets.length > 0) && (
         <div className="mt-12">
           <h2 className="mb-4 text-lg font-semibold text-gray-900">Related Items</h2>
           {relatedLoading ? (
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {Array.from({ length: 4 }).map((_, i) => (
                 <GadgetCardSkeleton key={i} />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {relatedGadgets.map((g) => (
                 <GadgetCard key={g._id} gadget={g} />
               ))}

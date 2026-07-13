@@ -16,6 +16,8 @@ import {
   UserPlus,
   LogOut,
   UserCircle,
+  PlusCircle,
+  ClipboardList,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -24,6 +26,12 @@ const navLinks = [
   { href: "/gadgets", label: "Explore", icon: Compass },
   { href: "/about", label: "About", icon: Info },
   { href: "/contact", label: "Contact", icon: Phone },
+];
+
+// লগইন করা থাকলে এই দুটো এক্সট্রা রুট যোগ হয়
+const authNavLinks = [
+  { href: "/items/add", label: "Sell Item", icon: PlusCircle },
+  { href: "/items/manage", label: "My Listings", icon: ClipboardList },
 ];
 
 // পেজ যেগুলো নিজস্ব DashboardShell/Sidebar ব্যবহার করে — এখানে টপ Navbar দেখানোর দরকার নেই
@@ -55,7 +63,7 @@ function BlackHoleIcon({ size = 34 }: { size?: number }) {
   );
 }
 
-function BlackHoleOverlay() {
+function BlackHoleOverlayWrapper({ onComplete }: { onComplete: () => void }) {
   return (
     <div className="pointer-events-none fixed inset-0 z-[999] flex items-center justify-center overflow-hidden">
       <motion.div
@@ -69,6 +77,7 @@ function BlackHoleOverlay() {
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 160, opacity: 1, rotate: 540 }}
         transition={{ duration: 0.9, ease: [0.6, 0, 0.9, 0.2] }}
+        onAnimationComplete={onComplete}
       />
     </div>
   );
@@ -87,7 +96,6 @@ export default function Navbar() {
 
   const dashboardHref = user?.role === "admin" ? "/admin" : "/items/manage";
 
-  // dashboard শেলযুক্ত পেজে পৌঁছানোর সাথে সাথে ওভারলে ও ট্রানজিশন স্টেট রিসেট
   useEffect(() => {
     if (pendingHref && pathname === pendingHref) {
       setIsTransitioning(false);
@@ -112,6 +120,9 @@ export default function Navbar() {
     router.push(dashboardHref);
   };
 
+  // লগইন থাকলে এক্সট্রা রুটগুলো যোগ হবে — মিনিমাম ৫+ রুট নিশ্চিত করার জন্য
+  const visibleLinks = user ? [...navLinks, ...authNavLinks] : navLinks;
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/80 backdrop-blur-md">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -125,8 +136,8 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden items-center gap-1 md:flex">
-            {navLinks.map(({ href, label, icon: Icon }) => {
+          <nav className="hidden items-center gap-1 lg:flex">
+            {visibleLinks.map(({ href, label, icon: Icon }) => {
               const active = isActive(href);
               return (
                 <Link
@@ -146,7 +157,7 @@ export default function Navbar() {
           </nav>
 
           {/* Auth Section */}
-          <div className="hidden items-center gap-3 md:flex">
+          <div className="hidden items-center gap-3 lg:flex">
             {loading ? (
               <div className="h-8 w-24 animate-pulse rounded-full bg-gray-100" />
             ) : user ? (
@@ -170,7 +181,6 @@ export default function Navbar() {
                   className="flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
                 >
                   <LogOut size={16} />
-                  {/* Logout */}
                 </button>
               </div>
             ) : (
@@ -210,7 +220,7 @@ export default function Navbar() {
 
           {/* Mobile Menu Button */}
           <button
-            className="p-2 md:hidden"
+            className="p-2 lg:hidden"
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
           >
@@ -220,8 +230,8 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="flex flex-col gap-1 pb-4 md:hidden">
-            {navLinks.map(({ href, label, icon: Icon }) => {
+          <div className="flex flex-col gap-1 pb-4 lg:hidden">
+            {visibleLinks.map(({ href, label, icon: Icon }) => {
               const active = isActive(href);
               return (
                 <Link
@@ -267,7 +277,6 @@ export default function Navbar() {
                   className="flex items-center justify-center gap-1.5 rounded-lg bg-red-50 py-2 text-sm font-medium text-red-600"
                 >
                   <LogOut size={16} />
-                  {/* Logout */}
                 </button>
               </div>
             ) : (
@@ -301,25 +310,5 @@ export default function Navbar() {
         <BlackHoleOverlayWrapper onComplete={handleOverlayAnimationComplete} />
       )}
     </header>
-  );
-}
-
-function BlackHoleOverlayWrapper({ onComplete }: { onComplete: () => void }) {
-  return (
-    <div className="pointer-events-none fixed inset-0 z-[999] flex items-center justify-center overflow-hidden">
-      <motion.div
-        className="rounded-full"
-        style={{
-          width: 30,
-          height: 30,
-          background:
-            "radial-gradient(circle, #000 0%, #0f172a 20%, #2563EB 35%, #0D9488 50%, #000 72%)",
-        }}
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 160, opacity: 1, rotate: 540 }}
-        transition={{ duration: 0.9, ease: [0.6, 0, 0.9, 0.2] }}
-        onAnimationComplete={onComplete}
-      />
-    </div>
   );
 }

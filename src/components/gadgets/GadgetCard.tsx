@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { MapPin } from "lucide-react";
+import { MapPin, ArrowRight } from "lucide-react";
 
 export interface Gadget {
   _id: string;
@@ -12,6 +12,7 @@ export interface Gadget {
   condition: "new" | "used" | "refurbished";
   images: string[];
   location: string;
+  shortDescription?: string;
 }
 
 const conditionColor: Record<string, string> = {
@@ -37,7 +38,6 @@ export default function GadgetCard({ gadget }: { gadget: Gadget }) {
             className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
           />
 
-          {/* subtle bottom gradient for text legibility / premium feel */}
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
 
           <span
@@ -53,14 +53,25 @@ export default function GadgetCard({ gadget }: { gadget: Gadget }) {
             {gadget.title}
           </h3>
 
+          {gadget.shortDescription && (
+            <p className="line-clamp-2 text-xs leading-relaxed text-gray-500">
+              {gadget.shortDescription}
+            </p>
+          )}
+
           <p className="flex items-baseline gap-0.5 text-lg font-bold text-blue-600">
             <span className="text-sm font-semibold">৳</span>
             {gadget.price.toLocaleString()}
           </p>
 
-          <div className="mt-auto flex items-center gap-1 pt-1 text-xs text-gray-500">
+          <div className="flex items-center gap-1 text-xs text-gray-500">
             <MapPin size={12} className="shrink-0" />
             <span className="line-clamp-1">{gadget.location}</span>
+          </div>
+
+          <div className="mt-auto flex items-center justify-center gap-1.5 rounded-lg border border-blue-100 bg-blue-50 py-2 text-xs font-semibold text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
+            View Details
+            <ArrowRight size={13} />
           </div>
         </div>
       </Link>
